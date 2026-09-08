@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>W5 Gate Scorecard (Live) — 1305493</title>
+  <style>
+    :root {
+      --ink: #141B24;
+      --ink-2: #3A4655;
+      --ink-3: #6A7686;
+      --line: #C9CFD8;
+      --line-2: #E4E7EC;
+      --soft: #F3F5F8;
+      --accent: #2A9D8F;
+      --accent-soft: #E1F1EE;
+      --good: #2A9D8F;
+      --warn: #C98A12;
+      --stop: #C6402A;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    body {
+      margin: 0;
+      background: #E7E9EE;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, "Noto Sans Thai", system-ui, sans-serif;
+      line-height: 1.45;
+    }
+
+    .mono {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace
+    }
+
+    .sheet {
+      background: #fff;
+      width: 210mm;
+      max-width: 100%;
+      min-height: 297mm;
+      margin: 14px auto;
+      padding: 16mm 15mm;
+      box-shadow: 0 4px 24px rgba(20, 27, 36, .14);
+      position: relative
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 9px;
+      margin-bottom: 12px
+    }
+
+    .top .tag {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--ink);
+      padding: 4px 8px;
+      border-radius: 5px
+    }
+
+    .top h1 {
+      margin: 6px 0 2px;
+      font-size: 22px;
+      letter-spacing: -.01em
+    }
+
+    .top .sub {
+      margin: 0;
+      font-size: 12px;
+      color: var(--ink-3)
+    }
+
+    .top .right {
+      text-align: right;
+      font-size: 11px;
+      color: var(--ink-3);
+      font-family: ui-monospace, Menlo, monospace
+    }
+
+    .meta {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 10px 14px;
+      margin-bottom: 14px
+    }
+
+    .meta .f {
+      border-bottom: 1px solid var(--line);
+      padding: 2px 0 2px
+    }
+
+    .meta .lbl {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 9.5px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      display: block;
+      margin-bottom: 2px
+    }
+
+    .meta input,
+    .meta select {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-size: 13px;
+      color: var(--ink);
+      font-family: inherit;
+      padding: 2px 0 4px
+    }
+
+    .meta select {
+      cursor: pointer
+    }
+
+    table.sc {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 12px;
+      margin-bottom: 12px
+    }
+
+    table.sc th,
+    table.sc td {
+      border: 1px solid var(--line);
+      padding: 8px 9px;
+      vertical-align: top;
+      text-align: left
+    }
+
+    table.sc th {
+      background: var(--soft);
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 10px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--ink-2)
+    }
+
+    table.sc .pil {
+      font-weight: 800;
+      font-size: 12.5px;
+      white-space: nowrap
+    }
+
+    table.sc .chk {
+      color: var(--ink-2);
+      font-size: 11.5px
+    }
+
+    table.sc .chk li {
+      margin: 1px 0
+    }
+
+    table.sc ul {
+      margin: 3px 0 0;
+      padding-left: 15px
+    }
+
+    /* clickable P / C / F */
+    .pcf {
+      white-space: nowrap;
+      text-align: center
+    }
+
+    .pcf label {
+      display: inline-block;
+      border: 1.5px solid var(--line);
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      line-height: 23px;
+      text-align: center;
+      margin: 0 2px;
+      color: var(--ink-3);
+      font-family: ui-monospace, Menlo, monospace;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+      user-select: none;
+      transition: all .12s
+    }
+
+    .pcf input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0
+    }
+
+    .pcf label:hover {
+      border-color: var(--ink-3)
+    }
+
+    .pcf input:checked+span {}
+
+    .pcf label.sel-p {
+      background: var(--good);
+      border-color: var(--good);
+      color: #fff
+    }
+
+    .pcf label.sel-c {
+      background: var(--warn);
+      border-color: var(--warn);
+      color: #fff
+    }
+
+    .pcf label.sel-f {
+      background: var(--stop);
+      border-color: var(--stop);
+      color: #fff
+    }
+
+    .rule {
+      background: var(--accent-soft);
+      border-radius: 8px;
+      padding: 8px 11px;
+      font-size: 11.5px;
+      color: var(--ink-2);
+      margin-bottom: 13px
+    }
+
+    .rule b {
+      color: var(--ink)
+    }
+
+    /* live computed decision */
+    .decision {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-bottom: 13px
+    }
+
+    .band {
+      border: 1.5px solid var(--line);
+      border-radius: 9px;
+      padding: 10px 11px;
+      text-align: center;
+      opacity: .4;
+      transition: all .15s
+    }
+
+    .band .bt {
+      font-family: ui-monospace, Menlo, monospace;
+      font-weight: 800;
+      font-size: 14px
+    }
+
+    .band .d {
+      font-size: 9.5px;
+      color: var(--ink-3);
+      margin-top: 2px
+    }
+
+    .band.p {
+      border-color: var(--good)
+    }
+
+    .band.p .bt {
+      color: var(--good)
+    }
+
+    .band.c {
+      border-color: var(--warn)
+    }
+
+    .band.c .bt {
+      color: var(--warn)
+    }
+
+    .band.f {
+      border-color: var(--stop)
+    }
+
+    .band.f .bt {
+      color: var(--stop)
+    }
+
+    .band.active {
+      opacity: 1;
+      box-shadow: 0 3px 12px rgba(20, 27, 36, .12);
+      transform: translateY(-1px)
+    }
+
+    .band.active.p {
+      background: var(--accent-soft)
+    }
+
+    .band.active.c {
+      background: #FBF1DC
+    }
+
+    .band.active.f {
+      background: #FBE6E1
+    }
+
+    .box {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 10px 12px;
+      margin-bottom: 11px
+    }
+
+    .box .h {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 10px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 5px
+    }
+
+    textarea,
+    input.tin {
+      width: 100%;
+      border: 1px solid var(--line-2);
+      border-radius: 6px;
+      background: var(--soft);
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--ink);
+      padding: 7px 9px;
+      resize: vertical
+    }
+
+    textarea:focus,
+    input.tin:focus {
+      outline: 0;
+      border-color: var(--accent);
+      background: #fff
+    }
+
+    .fixgrid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 8px 12px;
+      font-size: 11px
+    }
+
+    .fixgrid .lbl {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 9.5px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      display: block;
+      margin-bottom: 3px
+    }
+
+    .note-p {
+      font-size: 10px;
+      color: var(--ink-3);
+      text-align: center;
+      margin-top: 10px
+    }
+
+    /* submit bar — screen only */
+    .submitbar {
+      position: sticky;
+      bottom: 0;
+      margin: 16px -15mm -16mm;
+      padding: 12px 15mm;
+      background: #fff;
+      border-top: 1px solid var(--line-2);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      box-shadow: 0 -4px 16px rgba(20, 27, 36, .06)
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      transition: opacity .12s
+    }
+
+    .btn:hover {
+      opacity: .9
+    }
+
+    .btn:disabled {
+      opacity: .5;
+      cursor: not-allowed
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--ink-2);
+      border: 1.5px solid var(--line)
+    }
+
+    .status {
+      font-size: 12px;
+      color: var(--ink-3)
+    }
+
+    .status.ok {
+      color: var(--good);
+      font-weight: 700
+    }
+
+    .status.err {
+      color: var(--stop);
+      font-weight: 700
+    }
+
+    .liveverdict {
+      font-family: ui-monospace, Menlo, monospace;
+      font-weight: 800;
+      font-size: 13px
+    }
+
+    @media print {
+      body {
+        background: #fff
+      }
+
+      .sheet {
+        box-shadow: none;
+        margin: 0;
+        width: auto;
+        min-height: auto;
+        padding: 12mm 12mm;
+        page-break-after: always
+      }
+
+      .submitbar {
+        display: none
+      }
+
+      @page {
+        size: A4;
+        margin: 0
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <form class="sheet" id="gateForm" autocomplete="off">
+    <div class="top">
+      <div>
+        <span class="tag">1305493 · W5 · USER VALIDATION GATE</span>
+        <h1>Gate Scorecard <span style="font-size:12px;color:var(--ink-3);font-weight:400">· live / กรอกออนไลน์</span>
+        </h1>
+        <p class="sub">DISCOVER phase · pass / fail · 10 of 50 Project points · Dr. Prasara Jakkaew · ADT MFU</p>
+      </div>
+      <div class="right">9 ก.ย. 2569<br>one submission per company</div>
+    </div>
+
+    <div class="meta">
+      <div class="f"><span class="lbl">Company / team</span><input name="team" required
+          placeholder="ชื่อทีม / บริษัทจำลอง" /></div>
+      <div class="f"><span class="lbl">Project / product</span><input name="project" placeholder="ชื่อโปรเจกต์" /></div>
+      <div class="f"><span class="lbl">Reviewer</span><input name="reviewer" required placeholder="ชื่อผู้ประเมิน" />
+      </div>
+      <div class="f"><span class="lbl">Reviewer role</span>
+        <select name="role">
+          <option value="peer">Peer (นศ.)</option>
+          <option value="instructor">Instructor</option>
+          <option value="self">Self (ทีมตัวเอง)</option>
+        </select>
+      </div>
+      <div class="f"><span class="lbl">Reviewer ID / รหัส นศ.</span><input name="reviewerId"
+          placeholder="เช่น 66xxxxxxx" /></div>
+    </div>
+
+    <table class="sc">
+      <thead>
+        <tr>
+          <th style="width:15%">Pillar</th>
+          <th>What passes</th>
+          <th style="width:26%">Verdict</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="pil">1 · Validated need</td>
+          <td class="chk">
+            <ul>
+              <li>One path shown: <b>A</b> interviews ≥5 (target ≥15) · <b>B</b> user research (competitors / community,
+                screenshot + source) · <b>C</b> advisor / sponsor brief</li>
+              <li>Concrete evidence, not a bare claim · a shared, repeated pain</li>
+              <li><b>Usability test planned</b> (who / tasks / when) — required for every path</li>
+            </ul>
+          </td>
+          <td class="pcf" data-pillar="p1">
+            <label class="opt-p"><input type="radio" name="p1" value="P" required>P</label><label class="opt-c"><input
+                type="radio" name="p1" value="C">C</label><label class="opt-f"><input type="radio" name="p1"
+                value="F">F</label>
+          </td>
+        </tr>
+        <tr>
+          <td class="pil">2 · 4 diagrams</td>
+          <td class="chk">
+            <ul>
+              <li>D1 context · D2 use case/story map · D3 architecture · D4 activity/sequence — all present</li>
+              <li><b>Consistent:</b> actors, use cases, components &amp; backlog all agree</li>
+            </ul>
+          </td>
+          <td class="pcf" data-pillar="p2">
+            <label class="opt-p"><input type="radio" name="p2" value="P" required>P</label><label class="opt-c"><input
+                type="radio" name="p2" value="C">C</label><label class="opt-f"><input type="radio" name="p2"
+                value="F">F</label>
+          </td>
+        </tr>
+        <tr>
+          <td class="pil">3 · Traceability</td>
+          <td class="chk">
+            <ul>
+              <li>Every backlog item traces to a pain → requirement → item → design</li>
+              <li>No orphan / solution-first features ("which user asked for this?")</li>
+            </ul>
+          </td>
+          <td class="pcf" data-pillar="p3">
+            <label class="opt-p"><input type="radio" name="p3" value="P" required>P</label><label class="opt-c"><input
+                type="radio" name="p3" value="C">C</label><label class="opt-f"><input type="radio" name="p3"
+                value="F">F</label>
+          </td>
+        </tr>
+        <tr>
+          <td class="pil">4 · Compliance</td>
+          <td class="chk">
+            <ul>
+              <li><span class="mono">rule.md</span> at repo root (next to <span class="mono">CLAUDE.md</span>)</li>
+              <li>PDPA · Computer Crime Act §26 (logs ≥90d) · ETA — written as real backlog requirements, not prose</li>
+            </ul>
+          </td>
+          <td class="pcf" data-pillar="p4">
+            <label class="opt-p"><input type="radio" name="p4" value="P" required>P</label><label class="opt-c"><input
+                type="radio" name="p4" value="C">C</label><label class="opt-f"><input type="radio" name="p4"
+                value="F">F</label>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="rule"><b>Decision rule:</b> all four <b>P</b> → PASS. &nbsp; One <b>C</b>, rest P → CONDITIONAL. &nbsp;
+      Any <b>F</b>, or two+ <b>C</b> → FAIL. <span style="color:var(--ink-3)">(คิดให้อัตโนมัติด้านล่าง)</span></div>
+
+    <div class="decision">
+      <div class="band p" data-band="PASS">
+        <div class="bt">✓ PASS</div>
+        <div class="d">BUILD unlocked</div>
+      </div>
+      <div class="band c" data-band="CONDITIONAL">
+        <div class="bt">◐ CONDITIONAL</div>
+        <div class="d">fix + re-submit</div>
+      </div>
+      <div class="band f" data-band="FAIL">
+        <div class="bt">✕ FAIL</div>
+        <div class="d">rework DISCOVER</div>
+      </div>
+    </div>
+
+    <div class="box">
+      <div class="h">Reviewer notes · the one PASS-blocker to fix first</div>
+      <textarea name="notes" rows="2" placeholder="สิ่งที่ต้องแก้ก่อนเป็นอันดับแรก..."></textarea>
+    </div>
+
+    <div class="box">
+      <div class="h">Fix-it plan (if CONDITIONAL / FAIL)</div>
+      <div class="fixgrid">
+        <div><span class="lbl">The gap → the concrete fix</span><input class="tin" name="fixGap"
+            placeholder="ช่องว่าง → วิธีแก้"></div>
+        <div><span class="lbl">Owner</span><input class="tin" name="fixOwner" placeholder="ผู้รับผิดชอบ"></div>
+        <div><span class="lbl">Re-submit by (≤ W6, 16 Sep)</span><input class="tin" name="fixBy" placeholder="วันที่">
+        </div>
+      </div>
+    </div>
+
+    <p class="note-p">Graded inside the Project (10/50) · separate from the written Midterm · "Don't pass, don't start
+      BUILD."</p>
+
+    <div class="submitbar">
+      <button type="submit" class="btn" id="submitBtn">ส่งผลประเมิน · Submit</button>
+      <span class="liveverdict" id="liveVerdict" style="color:var(--ink-3)">verdict: —</span>
+      <span class="status" id="status" style="margin-left:auto">ยังไม่ได้ส่ง</span>
+    </div>
+  </form>
+
+  <script>
+    /* ============================================================
+       CONFIG — วาง URL ของ Google Apps Script Web App ตรงนี้
+       (ดูวิธี deploy ในไฟล์ W5-Gate-Scorecard-AppsScript.gs)
+       ============================================================ */
+    const SHEET_ENDPOINT = "https://script.google.com/macros/s/AKfycbyUZ11a5aBUI2C3jWiSpQUnjCgs3vPem0tKEV7vn6s-KTEWS5lZm5cmKAmeAzoblO4n/exec";
+
+    const form = document.getElementById('gateForm');
+    const statusEl = document.getElementById('status');
+    const liveVerdict = document.getElementById('liveVerdict');
+    const submitBtn = document.getElementById('submitBtn');
+
+    /* ---- clickable P/C/F styling ---- */
+    document.querySelectorAll('.pcf').forEach(cell => {
+      cell.querySelectorAll('input[type=radio]').forEach(r => {
+        r.addEventListener('change', () => {
+          cell.querySelectorAll('label').forEach(l => l.classList.remove('sel-p', 'sel-c', 'sel-f'));
+          const lab = r.closest('label');
+          lab.classList.add(r.value === 'P' ? 'sel-p' : r.value === 'C' ? 'sel-c' : 'sel-f');
+          computeVerdict();
+        });
+      });
+    });
+
+    /* ---- decision rule (auto) ---- */
+    function computeVerdict() {
+      const vals = ['p1', 'p2', 'p3', 'p4'].map(n => (form.elements[n].value || ''));
+      if (vals.some(v => v === '')) { setBand(null); return null; }
+      const f = vals.filter(v => v === 'F').length;
+      const c = vals.filter(v => v === 'C').length;
+      let verdict;
+      if (f > 0 || c >= 2) verdict = 'FAIL';
+      else if (c === 1) verdict = 'CONDITIONAL';
+      else verdict = 'PASS';
+      setBand(verdict);
+      return verdict;
+    }
+    function setBand(v) {
+      document.querySelectorAll('.band').forEach(b => b.classList.toggle('active', b.dataset.band === v));
+      const color = v === 'PASS' ? 'var(--good)' : v === 'CONDITIONAL' ? 'var(--warn)' : v === 'FAIL' ? 'var(--stop)' : 'var(--ink-3)';
+      liveVerdict.textContent = 'verdict: ' + (v || '—');
+      liveVerdict.style.color = color;
+    }
+
+    /* ---- submit ---- */
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const verdict = computeVerdict();
+      if (!verdict) { setStatus('กรุณาให้ verdict ครบทั้ง 4 เสา', 'err'); return; }
+      if (SHEET_ENDPOINT.startsWith('PASTE_')) { setStatus('ยังไม่ได้ตั้งค่า SHEET_ENDPOINT ในไฟล์', 'err'); return; }
+
+      const data = Object.fromEntries(new FormData(form).entries());
+      data.verdict = verdict;
+      data.submittedAt = new Date().toISOString();
+
+      submitBtn.disabled = true;
+      setStatus('กำลังส่ง...', '');
+      try {
+        await fetch(SHEET_ENDPOINT, {
+          method: 'POST',
+          mode: 'no-cors',                 // Apps Script ตอบแบบ opaque — no-cors หลบ preflight
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(data)
+        });
+        setStatus('✓ ส่งเรียบร้อย (' + verdict + ') — บันทึกลง Sheet แล้ว', 'ok');
+        submitBtn.textContent = 'ส่งอีกทีม · New submission';
+        form.querySelectorAll('input:not([name=reviewer]):not([name=reviewerId]):not([name=role]), textarea').forEach(el => { if (el.type !== 'radio') el.value = ''; });
+        form.querySelectorAll('input[type=radio]').forEach(r => r.checked = false);
+        document.querySelectorAll('.pcf label').forEach(l => l.classList.remove('sel-p', 'sel-c', 'sel-f'));
+        setBand(null);
+      } catch (err) {
+        setStatus('✕ ส่งไม่สำเร็จ: ' + err.message + ' — ลองใหม่', 'err');
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+    function setStatus(msg, kind) { statusEl.textContent = msg; statusEl.className = 'status ' + (kind || ''); }
+  </script>
+</body>
+
+</html>
