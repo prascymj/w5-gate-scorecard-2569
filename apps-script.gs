@@ -47,28 +47,12 @@ function doPost(e) {
       return data[h] !== undefined ? data[h] : '';
     });
 
-    // ── 1 ทีม 1 แถว (upsert) ──
-    // หาแถวที่ชื่อทีมตรงกัน (ตัดช่องว่าง + ไม่สนตัวพิมพ์เล็ก/ใหญ่) แล้วเขียนทับ
-    // ถ้าไม่เจอ = ทีมใหม่ → ต่อแถว
-    var key = normKey(data.team);
-    var teamCol = HEADERS.indexOf('team') + 1;  // 1-based
-    var updated = false;
-    if (key) {
-      var last = sh.getLastRow();
-      if (last >= 2) {
-        var teams = sh.getRange(2, teamCol, last - 1, 1).getValues();
-        for (var i = 0; i < teams.length; i++) {
-          if (normKey(teams[i][0]) === key) {
-            sh.getRange(i + 2, 1, 1, HEADERS.length).setValues([row]);
-            updated = true;
-            break;
-          }
-        }
-      }
-    }
-    if (!updated) sh.appendRow(row);
+    // ── โหมด APPEND (ค่าปัจจุบัน) ──
+    // ส่งกี่ครั้งก็ต่อแถวใหม่เสมอ · peer หลายคน + อาจารย์ ต่างได้แถวของตัวเอง ไม่ทับกัน
+    // (ถ้าอยากได้ "1 ทีม 1 แถว" ดูบล็อก upsert ที่คอมเมนต์ไว้ท้ายไฟล์)
+    sh.appendRow(row);
 
-    return json({ ok: true, mode: updated ? 'updated' : 'inserted' });
+    return json({ ok: true, mode: 'inserted' });
   } catch (err) {
     return json({ ok: false, error: String(err) });
   } finally {
@@ -76,9 +60,31 @@ function doPost(e) {
   }
 }
 
-function normKey(s) {
-  return String(s == null ? '' : s).trim().toLowerCase().replace(/\s+/g, ' ');
-}
+/*
+ * ── ทางเลือก: "1 ทีม 1 แถว" (upsert) ──
+ * ถ้าวันหลังอยากให้ส่งซ้ำแล้วเขียนทับแถวเดิมแทนการต่อแถว
+ * ให้แทนบรรทัด `sh.appendRow(row);` ด้านบนด้วยบล็อกนี้ แล้ว "Deploy → New version"
+ *
+ *   var key = normKey(data.team);
+ *   var teamCol = HEADERS.indexOf('team') + 1;
+ *   var updated = false, last = sh.getLastRow();
+ *   if (key && last >= 2) {
+ *     var teams = sh.getRange(2, teamCol, last - 1, 1).getValues();
+ *     for (var i = 0; i < teams.length; i++) {
+ *       if (normKey(teams[i][0]) === key) {
+ *         sh.getRange(i + 2, 1, 1, HEADERS.length).setValues([row]);
+ *         updated = true; break;
+ *       }
+ *     }
+ *   }
+ *   if (!updated) sh.appendRow(row);
+ *
+ * และเพิ่มฟังก์ชันนี้:
+ *   function normKey(s){ return String(s==null?'':s).trim().toLowerCase().replace(/\s+/g,' '); }
+ *
+ * ⚠️ ข้อควรรู้: คีย์เป็น "ชื่อทีม" ล้วน — ถ้า peer หลายคนรีวิวทีมเดียวกัน คนหลังจะทับคนแรก
+ * (เหลือ verdict สุดท้าย). ถ้าอยากเก็บทุกความเห็นแต่กันส่งซ้ำของ "คนเดิม" ให้เปลี่ยนคีย์เป็น team+reviewer.
+ */
 
 // เผื่อเปิด URL ตรงๆ ในเบราว์เซอร์เพื่อเช็คว่า deploy แล้ว
 function doGet() {
